@@ -1,4 +1,6 @@
+import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
+import { events } from "@/constants";
 
 
 export default function Home() {
@@ -15,6 +17,22 @@ export default function Home() {
       </p>
 
       <ExploreBtn />
+
+      <div className="mt-20 space-y-7" id="events">
+        <h3>Featured Events</h3>
+
+        <ul className="events list-none">
+          {
+            events.map(
+              (event) => (
+                <li key={event.slug}>
+                  <EventCard {...event} />
+                </li>
+              )
+            )
+          }
+        </ul>
+      </div>
     </section>
   );
 }
