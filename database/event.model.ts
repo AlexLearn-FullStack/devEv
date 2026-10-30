@@ -134,6 +134,8 @@ function generateSlug(title: string): string {
   return title
     .toLowerCase()
     .trim()
+    .replace(/\+/g, ' plus ')
+    .replace(/#/g, ' sharp ')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
@@ -145,30 +147,35 @@ function normalizeDate(dateString: string): string {
     'january', 'february', 'march', 'april', 'may', 'june',
     'july', 'august', 'september', 'october', 'november', 'december',
   ];
-  const match = dateString.trim().match(/^([a-z]+)\s+(\d{1,2}),\s+(\d{4})$/i);
+  const match = dateString.trim().match(/^([a-z]+)\s+(\d{1,2})(?:\s*-\s*(\d{1,2}))?,\s+(\d{4})$/i);
 
   if (!match) {
-    throw new Error('Invalid date format. Use Month D, YYYY (e.g., January 1, 2023)');
+    throw new Error('Invalid date format. Use Month D, YYYY or Month D-D, YYYY (e.g., January 1, 2023)');
   }
 
   const month = months.indexOf(match[1].toLowerCase());
   if (month === -1) {
-    throw new Error('Invalid date format. Use Month D, YYYY (e.g., January 1, 2023)');
+    throw new Error('Invalid date format. Use Month D, YYYY or Month D-D, YYYY (e.g., January 1, 2023)');
   }
 
   const day = Number(match[2]);
-  const year = Number(match[3]);
+  const endDay = match[3] ? Number(match[3]) : day;
+  const year = Number(match[4]);
   const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
   const daysInMonth = [
     31, isLeapYear ? 29 : 28, 31, 30, 31, 30,
     31, 31, 30, 31, 30, 31,
   ];
 
-  if (year === 0 || day < 1 || day > daysInMonth[month]) {
+  if (year === 0 || day < 1 || endDay < day || endDay > daysInMonth[month]) {
     throw new Error('Invalid calendar date');
   }
 
-  return `${year.toString().padStart(4, '0')}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  const formatDay = (value: number) =>
+    `${year.toString().padStart(4, '0')}-${(month + 1).toString().padStart(2, '0')}-${value.toString().padStart(2, '0')}`;
+  const startDate = formatDay(day);
+
+  return endDay === day ? startDate : `${startDate} - ${formatDay(endDay)}`;
 }
 
 function normalizeTime(timeString: string): string {
@@ -199,8 +206,8 @@ function normalizeTime(timeString: string): string {
   return `${hours.toString().padStart(2, '0')}:${minutes}`;
 }
 
-EventSchema.index({ slug: 1 }, { unique: true });
 
+EventSchema.index({ slug: 1 }, { unique: true });
 EventSchema.index({ date: 1, mode: 1 });
 
 

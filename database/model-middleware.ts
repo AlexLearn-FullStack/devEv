@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/complexity/useArrowFunction: leave as is */
+/** biome-ignore-all lint/suspicious/noPrototypeBuiltins: leave as is */
 import type { Schema } from 'mongoose';
 
 
@@ -32,6 +34,35 @@ export function requireDocumentSaveForFieldUpdates(
     }
   });
 
+  schema.pre("bulkWrite", function (operations: readonly unknown[]) {
+    for (const operation of operations) {
+      if (typeof operation !== "object" || operation === null) continue;
+
+      const bulkOperation = operation as Record<string, unknown>;
+      const updateOperation =
+        bulkOperation.updateOne ?? bulkOperation.updateMany;
+
+      if (typeof updateOperation === "object" && updateOperation !== null) {
+        const update = (updateOperation as { update?: unknown }).update;
+
+        if (
+          Array.isArray(update) ||
+          fields.some((field) => updateModifiesPath(update, field))
+        ) {
+          throw new Error(
+            `Bulk writes cannot modify ${fields.join(", ")}. Load the document and call save() instead.`,
+          );
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(bulkOperation, "replaceOne")) {
+        throw new Error(
+          "Bulk replacements bypass save middleware. Load the document and call save() instead.",
+        );
+      }
+    }
+  });
+  
   schema.pre(queryReplacementMethods, () => {
     throw new Error('Query replacements bypass save middleware. Load the document and call save() instead.');
   });

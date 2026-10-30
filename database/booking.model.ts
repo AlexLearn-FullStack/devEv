@@ -1,4 +1,4 @@
-import { Schema, model, models } from 'mongoose';
+import { Error as MongooseError, Schema, model, models } from 'mongoose';
 import type { Document, Types } from "mongoose";
 import { requireDocumentSaveForFieldUpdates } from './model-middleware';
 
@@ -47,8 +47,16 @@ BookingSchema.pre('save', async function () {
     const eventExists = await Event.findById(booking.eventId).select('_id');
 
     if (!eventExists) {
-      const error = new Error(`Event with ID ${booking.eventId} does not exist`);
-      error.name = 'ValidationError';
+      const error = new MongooseError.ValidationError();
+      error.addError(
+        'eventId',
+        new MongooseError.ValidatorError({
+          path: 'eventId',
+          type: 'ref',
+          value: booking.eventId,
+          message: `Event with ID ${booking.eventId} does not exist`,
+        }),
+      );
       throw error;
     }
   }
