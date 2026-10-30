@@ -1,9 +1,9 @@
 /** biome-ignore-all lint/correctness/useParseIntRadix: Not needed? */
 import { Schema, model, models } from 'mongoose';
 import type { Document } from "mongoose";
+import { requireDocumentSaveForFieldUpdates } from './model-middleware';
 
 
-// TypeScript interface for Event document
 export interface IEvent extends Document {
   title: string;
   slug: string;
@@ -108,55 +108,77 @@ const EventSchema = new Schema<IEvent>(
     },
   },
   {
-    timestamps: true, // Auto-generate createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-// Pre-save hook for slug generation and data normalization
+requireDocumentSaveForFieldUpdates(EventSchema, ['title', 'date', 'time']);
+
 EventSchema.pre('save', async function () {
-  try {
-    const event = this as IEvent;
+  const event = this as IEvent;
 
-    if (event.isModified('title') || event.isNew) {
-      event.slug = generateSlug(event.title);
-    }
+  if (event.isModified('title') || event.isNew) {
+    event.slug = generateSlug(event.title);
+  }
 
-    if (event.isModified('date')) {
-      event.date = normalizeDate(event.date);
-    }
+  if (event.isModified('date')) {
+    event.date = normalizeDate(event.date);
+  }
 
-    if (event.isModified('time')) {
-      event.time = normalizeTime(event.time);
-    }
-
-  } catch (e) {
-    console.error("Error performin pre-save logic: ", e)
+  if (event.isModified('time')) {
+    event.time = normalizeTime(event.time);
   }
 });
 
-// Helper function to generate URL-friendly slug
 function generateSlug(title: string): string {
   return title
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+    .replace(/\+/g, ' plus ')
+    .replace(/#/g, ' sharp ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
-// Helper function to normalize date to ISO format
 function normalizeDate(dateString: string): string {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) {
-    throw new Error('Invalid date format');
+  const months = [
+    'january', 'february', 'march', 'april', 'may', 'june',
+    'july', 'august', 'september', 'october', 'november', 'december',
+  ];
+  const match = dateString.trim().match(/^([a-z]+)\s+(\d{1,2})(?:\s*-\s*(\d{1,2}))?,\s+(\d{4})$/i);
+
+  if (!match) {
+    throw new Error('Invalid date format. Use Month D, YYYY or Month D-D, YYYY (e.g., January 1, 2023)');
   }
-  return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+
+  const month = months.indexOf(match[1].toLowerCase());
+  if (month === -1) {
+    throw new Error('Invalid date format. Use Month D, YYYY or Month D-D, YYYY (e.g., January 1, 2023)');
+  }
+
+  const day = Number(match[2]);
+  const endDay = match[3] ? Number(match[3]) : day;
+  const year = Number(match[4]);
+  const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [
+    31, isLeapYear ? 29 : 28, 31, 30, 31, 30,
+    31, 31, 30, 31, 30, 31,
+  ];
+
+  if (year === 0 || day < 1 || endDay < day || endDay > daysInMonth[month]) {
+    throw new Error('Invalid calendar date');
+  }
+
+  const formatDay = (value: number) =>
+    `${year.toString().padStart(4, '0')}-${(month + 1).toString().padStart(2, '0')}-${value.toString().padStart(2, '0')}`;
+  const startDate = formatDay(day);
+
+  return endDay === day ? startDate : `${startDate} - ${formatDay(endDay)}`;
 }
 
-// Helper function to normalize time format
 function normalizeTime(timeString: string): string {
-  // Handle various time formats and convert to HH:MM (24-hour format)
   const timeRegex = /^(\d{1,2}):(\d{2})(\s*(AM|PM))?$/i;
   const match = timeString.trim().match(timeRegex);
   
@@ -169,7 +191,10 @@ function normalizeTime(timeString: string): string {
   const period = match[4]?.toUpperCase();
   
   if (period) {
-    // Convert 12-hour to 24-hour format
+    if (hours < 1 || hours > 12) {
+      throw new Error('Invalid time values');
+    }
+    
     if (period === 'PM' && hours !== 12) hours += 12;
     if (period === 'AM' && hours === 12) hours = 0;
   }
@@ -181,10 +206,8 @@ function normalizeTime(timeString: string): string {
   return `${hours.toString().padStart(2, '0')}:${minutes}`;
 }
 
-// Create unique index on slug for better performance
-EventSchema.index({ slug: 1 }, { unique: true });
 
-// Create compound index for common queries
+EventSchema.index({ slug: 1 }, { unique: true });
 EventSchema.index({ date: 1, mode: 1 });
 
 
