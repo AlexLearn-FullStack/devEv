@@ -1,9 +1,17 @@
+"use cache";
+
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
-import { events } from "@/constants";
+import { BASE_URL } from "@/constants";
+import type { IEvent } from "@/database";
+// import { events } from "@/constants";
 
 
-export default function Home() {
+
+export default async function Home() {
+  const response = await fetch(`${BASE_URL}/events`);
+  const { events } = await response.json();
+
   return (
     <section>
       <h1 className="text-center">
@@ -23,13 +31,14 @@ export default function Home() {
 
         <ul className="events list-none">
           {
-            events.map(
-              (event) => (
-                <li key={event.slug}>
-                  <EventCard {...event} />
-                </li>
+            events && events.length > 0
+              && events.map(
+                (event: IEvent) => (
+                  <li key={event.slug}>
+                    <EventCard {...event} />
+                  </li>
+                )
               )
-            )
           }
         </ul>
       </div>
