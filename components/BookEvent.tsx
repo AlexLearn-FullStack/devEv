@@ -31,6 +31,7 @@ export default function BookEvent () {
                   type="email"
                   id="email"
                   value={ email }
+                  required
                   placeholder="Enter your email address"
                   onChange={
                     (e) => setEmail(e.target.value)
