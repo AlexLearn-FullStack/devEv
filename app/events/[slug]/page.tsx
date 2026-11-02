@@ -66,22 +66,21 @@ export default async function EventDetailsPage (
       next: { revalidate: 60 }
     });
 
-    if (!req.ok) {
-      if (req.status === 404) {
-        return notFound();
-      }
-
+    if (req.status !== 404 && !req.ok) {
       throw new Error(`Failed to fetch event details: ${req.statusText}`);
     }
 
-    const response = await req.json();
-    event = response.event;
-
-    if (!event) return notFound();
+    if (req.status !== 404) {
+      const response = await req.json();
+      event = response.event;
+    }
     
   } catch (e) {
     console.error(`Error fetching event details: ${e}`);
+    throw e;
   }
+
+  if (!event) return notFound();
 
   const {
     title, description, image, overview,
