@@ -1,9 +1,39 @@
+"use cache";
+
+import { cacheTag } from "next/cache";
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
-import { events } from "@/constants";
+import { BASE_URL } from "@/constants";
+import type { IEvent } from "@/database";
 
 
-export default function Home() {
+export default async function Home() {
+  cacheTag("events");
+  let events: IEvent[] = [];
+  let eventsError: string | null = null;
+
+  try {
+    const response = await fetch(`${BASE_URL}/events`);
+    if (!response.ok) {
+      throw new Error(`Events request failed with status ${response.status}`);
+    }
+
+    const payload: unknown = await response.json();
+    if (
+      typeof payload !== "object" ||
+      payload === null ||
+      !("events" in payload) ||
+      !Array.isArray(payload.events)
+    ) {
+      throw new Error("Events response did not contain an events array");
+    }
+
+    events = payload.events as IEvent[];
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+    eventsError = "Events are temporarily unavailable. Please try again later.";
+  }
+
   return (
     <section>
       <h1 className="text-center">
@@ -23,13 +53,22 @@ export default function Home() {
 
         <ul className="events list-none">
           {
-            events.map(
-              (event) => (
-                <li key={event.slug}>
-                  <EventCard {...event} />
-                </li>
+            eventsError
+              ? (
+                <li role="alert">{eventsError}</li>
               )
-            )
+              : events.length > 0
+                ? (
+                  events.map(
+                    (event) => (
+                      <li key={event.slug}>
+                        <EventCard {...event} />
+                      </li>
+                    )
+                  )
+                ) : (
+                  <li>No events are available right now.</li>
+                )
           }
         </ul>
       </div>
