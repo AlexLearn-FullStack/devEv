@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/noImplicitAnyLet: initial */
 import Image from "next/image";
+import { cacheLife } from "next/cache";
 import { notFound } from "next/navigation";
 import { BASE_URL } from "@/constants";
 import BookEvent from "@/components/BookEvent";
@@ -58,6 +59,9 @@ const EventTags = ({ tags }: { tags: string[] }) => (
 export default async function EventDetailsPage (
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  "use cache";
+  cacheLife("hours");
+
   const { slug } = await params;
 
   let event;
@@ -175,7 +179,10 @@ export default async function EventDetailsPage (
                 )
             }
 
-            <BookEvent />
+            <BookEvent
+              eventId={ event._id }
+              slug={ slug }
+            />
           </div>
         </aside>
       </div>

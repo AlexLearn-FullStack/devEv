@@ -1,18 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { createBooking } from "@/lib/actions/booking.actions";
 
 
-export default function BookEvent () {
+interface Props {
+  eventId: string;
+  slug: string;
+}
+
+
+export default function  BookEvent ({ eventId, slug }: Props ) {
   const [ email, setEmail ] = useState('');
   const [ submitted, setSubmitted ] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    setTimeout(() => {
+
+    const { success, error } = await createBooking({eventId, slug, email});
+
+    if (success) {
       setSubmitted(true);
-    }, 1000)
+    } else {
+      console.error('Unable to Book event: ', error);
+    }
+    
   }
   
   
