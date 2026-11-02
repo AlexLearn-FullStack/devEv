@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/noImplicitAnyLet: declared this way for validation */
 import { NextResponse, type NextRequest } from "next/server";
+import { revalidateTag } from "next/cache";
 import { v2 as cloudinary } from "cloudinary";
 import connectDB from "@/lib/mongodb";
 import { Event } from "@/database";
@@ -22,11 +23,20 @@ export async function POST (req: NextRequest) {
       );
     }
 
-    const tags = JSON.parse(formData.get("tags") as string);
-    const agenda = JSON.parse(formData.get("agenda") as string);
+    let tags: unknown;
+    let agenda: unknown;
+    try {
+      tags = JSON.parse(String(formData.get("tags")));
+      agenda = JSON.parse(String(formData.get("agenda")));
+    } catch {
+      return NextResponse.json(
+        { message: "tags and agenda must be valid JSON arrays" },
+        { status: 400 },
+      );
+    }
 
-    const file = formData.get('image') as File;
-    if (!file)
+    const file = formData.get('image');
+    if (!(file instanceof File))
       return NextResponse.json(
         { message: "Image file is required" },
         { status: 400 }
@@ -56,6 +66,7 @@ export async function POST (req: NextRequest) {
       tags: tags,
       agenda: agenda,
     });
+    revalidateTag("events", "max");
 
     return NextResponse.json(
       {
@@ -82,7 +93,7 @@ export async function POST (req: NextRequest) {
 export async function GET () {
   try {
     await connectDB();
-
+    
     const events = await Event.find().sort({ createdAt: -1 });
     
     return NextResponse.json(
@@ -96,7 +107,7 @@ export async function GET () {
   catch (e) {
     console.error(e)
     return NextResponse.json(
-      { message: "Event fetching failed", error: e },
+      { message: "Event fetching failed", error: e, events: {} },
       { status: 500 }
     );
   }
