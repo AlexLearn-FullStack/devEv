@@ -19,7 +19,7 @@ export default function EventCard ({
 
       <div className="flex flex-row gap-2">
         <Image
-          src={'icons/pin.svg'}
+          src={'/icons/pin.svg'}
           alt="location"
           width={14} height={14}
         />
@@ -31,7 +31,7 @@ export default function EventCard ({
       <div className="datetime">
         <div>
           <Image
-            src={'icons/calendar.svg'}
+            src={'/icons/calendar.svg'}
             alt="date"
             width={14} height={14}
           />
@@ -40,7 +40,7 @@ export default function EventCard ({
         </div>
         <div>
           <Image
-            src={'icons/clock.svg'}
+            src={'/icons/clock.svg'}
             alt="time"
             width={14} height={14}
           />
