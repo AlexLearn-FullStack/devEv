@@ -1,6 +1,6 @@
 "use cache";
 
-import { cacheTag } from "next/cache";
+import { cacheTag, cacheLife } from "next/cache";
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
 import { BASE_URL } from "@/constants";
@@ -9,6 +9,7 @@ import type { IEvent } from "@/database";
 
 export default async function Home() {
   cacheTag("events");
+  cacheLife('hours');
   let events: IEvent[] = [];
   let eventsError: string | null = null;
 
