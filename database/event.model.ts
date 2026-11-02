@@ -33,7 +33,6 @@ const EventSchema = new Schema<IEvent>(
     },
     slug: {
       type: String,
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -76,8 +75,8 @@ const EventSchema = new Schema<IEvent>(
       type: String,
       required: [true, 'Mode is required'],
       enum: {
-        values: ['online', 'offline', 'hybrid'],
-        message: 'Mode must be either online, offline, or hybrid',
+        values: ['online', 'onsite', 'hybrid'],
+        message: 'Mode must be either online, onsite, or hybrid',
       },
     },
     audience: {

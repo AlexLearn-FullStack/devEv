@@ -21,11 +21,6 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
-      // Might wanna remove this later
-      {
-        protocol: "https",
-        hostname: "loremflickr.com",
-      },
     ],
   },
 };
