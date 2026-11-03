@@ -2,6 +2,7 @@ import BookEventFallback from "@/components/fallbacks/BookEventFallback";
 import EventCardFallback from "@/components/fallbacks/EventCardFallback";
 import { Skeleton } from "@/components/ui/skeleton";
 
+
 export default function EventDetailsFallback() {
   return (
     <section id="event" aria-busy="true">

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
@@ -6,6 +7,7 @@ import BookEvent from "@/components/BookEvent";
 import type { IEvent } from "@/database";
 import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
 import EventCard from "@/components/EventCard";
+import EventCardFallback from "@/components/fallbacks/EventCardFallback";
 
 
 const EventDetailItem = ({
@@ -50,6 +52,36 @@ const EventTags = ({ tags }: { tags: string[] }) => (
     }
   </div>
 );
+
+
+function SimilarEventsFallback() {
+  return (
+    <div className="events">
+      {
+        [1, 2, 3].map(
+          (i) => <EventCardFallback key={i} />
+        )
+      }
+    </div>
+  );
+}
+
+
+async function SimilarEvents({ slug }: { slug: string }) {
+  const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
+
+  return (
+    <div className="events">
+      {
+        similarEvents.length > 0
+          &&
+            similarEvents.map(
+              (event: IEvent) => <EventCard key={event.slug} {...event} />
+            )
+      }
+    </div>
+  );
+}
 
 
 export default async function EventDetails({
@@ -97,7 +129,6 @@ async function CachedEventDetails({ slug }: { slug: string }) {
   } = event;
 
   const bookings = 10;
-  const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
 
   return (
     <section id="event">
@@ -192,15 +223,9 @@ async function CachedEventDetails({ slug }: { slug: string }) {
       <div className="flex w-full flex-col gap-4 pt-20">
         <h2>Similar Events</h2>
 
-        <div className="events">
-          {
-            similarEvents.length > 0
-              &&
-                similarEvents.map(
-                  (event: IEvent) => <EventCard key={event.slug} {...event} />
-                )
-          }
-        </div>
+        <Suspense fallback={ <SimilarEventsFallback /> }>
+          <SimilarEvents slug={slug} />
+        </Suspense>
       </div>
     </section>
   );
