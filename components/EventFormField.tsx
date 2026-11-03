@@ -28,7 +28,7 @@ export default function EventFormField({
 
       {
         helperText && (
-          <p className="text-xs leading-relaxed text-light-200">
+          <p id={`${id}-helper`} className="text-xs leading-relaxed text-light-200">
             { helperText }
           </p>
         )
