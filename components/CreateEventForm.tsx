@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, CloudUpload } from "lucide-react";
 import EventFormField from "@/components/EventFormField";
 
+
 const controlClasses =
   "w-full rounded-md border border-[#263f48] bg-dark-200 px-3.5 py-3 text-sm text-light-100 placeholder:text-[#c0d2d5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
@@ -73,7 +74,7 @@ export default function CreateEventForm() {
           id="venue"
           name="venue"
           type="text"
-          placeholder="Enter venue name"
+          placeholder="The Majestic Downtown, or Online(if event is virtual)"
           required
         />
       </EventFormField>
@@ -88,15 +89,12 @@ export default function CreateEventForm() {
           id="location"
           name="location"
           type="text"
-          placeholder="Enter city, region, or online link"
+          placeholder="Los Angeles, USA or https://zoom.us...(for virtual events)"
           required
         />
       </EventFormField>
 
-      <EventFormField
-        id="mode"
-        label="Event Mode"
-      >
+      <EventFormField id="mode" label="Event Mode">
         <div className="relative">
           <select
             className={`${controlClasses} appearance-none pr-10`}
@@ -152,7 +150,7 @@ export default function CreateEventForm() {
           id="audience"
           name="audience"
           type="text"
-          placeholder="Who is this event for?"
+          placeholder="Developers, Designers, DevOps Engineers, etc."
           required
         />
       </EventFormField>
@@ -167,7 +165,7 @@ export default function CreateEventForm() {
           id="organizer"
           name="organizer"
           type="text"
-          placeholder="Organizer name or organization"
+          placeholder="GitHub - the world’s largest developer platform and a subsidiary of Microsoft."
           required
         />
       </EventFormField>
@@ -196,7 +194,7 @@ export default function CreateEventForm() {
           id="tags"
           name="tags"
           type="text"
-          placeholder="Add tags such as React, Next.js"
+          placeholder="AI, Web, Cloud, DevOps, etc."
           required
         />
       </EventFormField>
