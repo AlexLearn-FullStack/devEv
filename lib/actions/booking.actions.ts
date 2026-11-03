@@ -21,6 +21,16 @@ export const createBooking = async ({ eventId, slug, email }: ICreateBooking) =>
   }
   catch (e) {
     console.error('Create booking failed: ',e);
-    return { success: false, error: e };
+    const isDuplicateBooking =
+      (typeof e === "object" && e !== null && "code" in e && e.code === 11000) ||
+      String(e).includes("E11000 duplicate key error");
+
+    return {
+      success: false,
+      error: e,
+      message: isDuplicateBooking
+        ? "Looks like you've already signed up for the event"
+        : "Event sign up failed. Please try again later",
+    };
   }
 }

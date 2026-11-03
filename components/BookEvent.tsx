@@ -13,18 +13,27 @@ interface Props {
 export default function  BookEvent ({ eventId, slug }: Props ) {
   const [ email, setEmail ] = useState('');
   const [ submitted, setSubmitted ] = useState(false);
+  const [ isLoading, setIsLoading ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState<string | undefined>(undefined);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { success, error } = await createBooking({eventId, slug, email});
+    setIsLoading(true);
+    setErrorMessage(undefined);
 
-    if (success) {
-      setSubmitted(true);
-    } else {
-      console.error('Unable to Book event: ', error);
+    try {
+      const result = await createBooking({eventId, slug, email});
+
+      if (result.success) {
+        setSubmitted(true);
+      } else {
+        console.error('Unable to Book event: ', result.error);
+        setErrorMessage(result.message);
+      }
+    } finally {
+      setIsLoading(false);
     }
-    
   }
   
   
@@ -51,7 +60,21 @@ export default function  BookEvent ({ eventId, slug }: Props ) {
                 />
               </div>
 
-              <button type="submit" className="button-submit">Submit</button>
+              <button
+                type="submit"
+                className="button-submit"
+                disabled={ isLoading }
+              >
+                {
+                  isLoading
+                    ? 'Submitting...'
+                    : 'Submit'
+                }
+              </button>
+              {
+                errorMessage
+                  && <p className="text-sm" role="alert">{ errorMessage }</p>
+              }
             </form>
           )
       }
