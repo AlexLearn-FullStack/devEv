@@ -1,5 +1,6 @@
 import CreateEventForm from "@/components/CreateEventForm";
 
+
 export default function Page() {
   return (
     <section className="w-full">
