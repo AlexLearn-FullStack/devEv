@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { BASE_URL } from "@/constants";
 import BookEvent from "@/components/BookEvent";
@@ -65,6 +65,7 @@ export default async function EventDetails({
 
 async function CachedEventDetails({ slug }: { slug: string }) {
   "use cache";
+  cacheTag("events");
   cacheLife("hours");
 
   let event: IEvent | undefined;
