@@ -74,10 +74,21 @@ async function SimilarEvents({ slug }: { slug: string }) {
     <div className="events">
       {
         similarEvents.length > 0
-          &&
+          ?
             similarEvents.map(
-              (event: IEvent) => <EventCard key={event.slug} {...event} />
+              (event: IEvent) => (
+                <EventCard
+                  key={event.slug}
+                  {...event}
+                  mode={event.mode as "onsite" | "online" | "hybrid"}
+                />
+              )
             )
+          : (
+            <p className="text-sm sm:text-lg indent-4">
+              It seems this event is one of a kind.
+            </p>
+          )
       }
     </div>
   );

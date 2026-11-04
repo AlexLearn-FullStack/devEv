@@ -39,7 +39,7 @@ export default function EventFormField({
       
       {
         errorMessage && (
-          <p className="text-xs leading-relaxed text-red-300" role="alert">
+          <p id={`${id}-error`} className="text-xs leading-relaxed text-red-300" role="alert">
             { errorMessage }
           </p>
         )
