@@ -36,7 +36,9 @@ const EventAgenda = ({ agendaItems }: { agendaItems: string[] }) => (
     <ul>
       {
         agendaItems?.map(
-          (item) => <li key={item}>{ item }</li>
+          (item) => <li key={item}>
+            { item[0].toUpperCase() + item.slice(1) }
+          </li>
         )
       }
     </ul>
@@ -74,10 +76,21 @@ async function SimilarEvents({ slug }: { slug: string }) {
     <div className="events">
       {
         similarEvents.length > 0
-          &&
+          ?
             similarEvents.map(
-              (event: IEvent) => <EventCard key={event.slug} {...event} />
+              (event: IEvent) => (
+                <EventCard
+                  key={event.slug}
+                  {...event}
+                  mode={event.mode as "onsite" | "online" | "hybrid"}
+                />
+              )
             )
+          : (
+            <p className="text-sm sm:text-lg indent-4">
+              It seems this event is one of a kind.
+            </p>
+          )
       }
     </div>
   );
@@ -133,7 +146,7 @@ async function CachedEventDetails({ slug }: { slug: string }) {
   return (
     <section id="event">
       <div className="header">
-        <h1>{ title }</h1>
+        <h1 className="capitalize">{ title }</h1>
         <p>{ description }</p>
       </div>
 
@@ -164,7 +177,7 @@ async function CachedEventDetails({ slug }: { slug: string }) {
             <EventDetailItem
               icon="/icons/clock.svg"
               alt="clock"
-              label={ time }
+              label={`${ time } UTC `}
             />
 
             <EventDetailItem
