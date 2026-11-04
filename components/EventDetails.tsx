@@ -36,7 +36,9 @@ const EventAgenda = ({ agendaItems }: { agendaItems: string[] }) => (
     <ul>
       {
         agendaItems?.map(
-          (item) => <li key={item}>{ item }</li>
+          (item) => <li key={item}>
+            { item[0].toUpperCase() + item.slice(1) }
+          </li>
         )
       }
     </ul>
@@ -144,7 +146,7 @@ async function CachedEventDetails({ slug }: { slug: string }) {
   return (
     <section id="event">
       <div className="header">
-        <h1>{ title }</h1>
+        <h1 className="capitalize">{ title }</h1>
         <p>{ description }</p>
       </div>
 
@@ -175,7 +177,7 @@ async function CachedEventDetails({ slug }: { slug: string }) {
             <EventDetailItem
               icon="/icons/clock.svg"
               alt="clock"
-              label={ time }
+              label={`${ time } UTC `}
             />
 
             <EventDetailItem

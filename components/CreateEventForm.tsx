@@ -1,16 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, CloudUpload } from "lucide-react";
 import EventFormField from "@/components/EventFormField";
 import { useRouter } from "next/navigation";
 import {
   handleSubmit as submitEvent,
+  type EventField,
   type EventSubmissionResult,
 } from "@/lib/utils";
 
 
-const SUCCESS_REDIRECT_DELAY = 1500;
+const SUCCESS_REDIRECT_DELAY = 1000;
 
 
 const controlClasses =
@@ -26,7 +27,34 @@ export default function CreateEventForm() {
   const [ submissionResult, setSubmissionResult ] =
     useState<EventSubmissionResult | null>(null);
 
-  
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current !== null) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleFieldChange = (event: React.ChangeEvent<HTMLFormElement>) => {
+    const fieldName = event.target.name;
+
+    setSubmissionResult((currentResult) => {
+      if (
+        !currentResult ||
+        currentResult.success ||
+        !currentResult.fieldErrors ||
+        !(fieldName in currentResult.fieldErrors)
+      ) {
+        return currentResult;
+      }
+
+      const field = fieldName as EventField;
+      const fieldErrors = { ...currentResult.fieldErrors };
+      delete fieldErrors[field];
+      return { ...currentResult, fieldErrors };
+    });
+  };
+
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -69,6 +97,7 @@ export default function CreateEventForm() {
       ref={formRef}
       className="mx-auto flex w-full max-w-175 flex-col gap-5 rounded-lg border border-[#192a30] bg-dark-100 p-5 sm:p-7"
       onSubmit={handleSubmit}
+      onChange={handleFieldChange}
       noValidate
     >
       <EventFormField
