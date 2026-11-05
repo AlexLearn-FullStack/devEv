@@ -194,6 +194,7 @@ export default function CreateEventForm() {
         id="mode"
         label="Event Mode"
         errorMessage={fieldErrors.mode}
+        helperText="Select Event Modes: Onsite | Online | Hybrid"
       >
         <div className="relative">
           <select
