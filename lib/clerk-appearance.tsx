@@ -1,0 +1,26 @@
+export const clerkAppearance = {
+  variables: {
+    colorPrimary: "var(--primary)",
+    colorBackground: "var(--color-dark-100)",
+    colorText: "var(--color-light-100)",
+    colorTextSecondary: "var(--color-light-200)",
+    colorInputBackground: "var(--color-dark-200)",
+    colorInputText: "var(--color-light-100)",
+    colorNeutral: "var(--color-light-100)",
+    colorDanger: "var(--destructive)",
+    colorSuccess: "var(--primary)",
+    borderRadius: "var(--radius)",
+  },
+  elements: {
+    rootBox: "w-full",
+    card: "w-full border border-border shadow-xl",
+    headerTitle: "text-2xl font-bold !text-light-100",
+    headerSubtitle: "!text-light-100",
+    formFieldLabel: "!text-light-100",
+    socialButtonsBlockButtonText: "!text-light-100",
+    dividerText: "!text-light-200",
+    footerActionText: "!text-light-200",
+    footerActionLink: "!text-primary",
+    lastAuthenticationStrategyBadge: "!text-light-200",
+  },
+};
