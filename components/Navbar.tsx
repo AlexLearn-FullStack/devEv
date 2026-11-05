@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import SignedInNavItems from "./SignedInNavItems";
+import Avatar from "./Avatar";
 
 
 const Navbar = () => (
@@ -16,9 +18,10 @@ const Navbar = () => (
       </Link>
 
       <ul>
-        <Link href="/">Home</Link>
+        <Link href="/" className="max-[390px]:hidden">Home</Link>
         <Link href="/events">Events</Link>
-        <Link href="/create">Create Event</Link>
+        <SignedInNavItems />
+        <Avatar />
       </ul>
     </nav>
   </header>

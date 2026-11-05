@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Schibsted_Grotesk, Martian_Mono } from "next/font/google";
 import "./globals.css";
@@ -28,26 +29,27 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body
         className={`${schibstedGrotesk.variable} ${martianMono.variable} antialiased min-h-screen`}
       >
-        <Navbar />
-        
-        <div className="absolute inset-0 top-0 -z-1 min-h-screen">
-          <LightRays
-            raysOrigin="top-center-offset"
-            raysColor="#5dfeca"
-            raysSpeed={.5}
-            lightSpread={.9}
-            rayLength={1.4}
-            followMouse
-            mouseInfluence={.02}
-            noiseAmount={0}
-            distortion={.01}
-          />
-        </div>
-
-        <main>
-          { children }
-        </main>
-        <SpeedInsights/>
+        <ClerkProvider>
+          <Navbar />
+          
+          <div className="absolute inset-0 top-0 -z-1 min-h-screen">
+            <LightRays
+              raysOrigin="top-center-offset"
+              raysColor="#5dfeca"
+              raysSpeed={.5}
+              lightSpread={.9}
+              rayLength={1.4}
+              followMouse
+              mouseInfluence={.02}
+              noiseAmount={0}
+              distortion={.01}
+            />
+          </div>
+          <main>
+            { children }
+          </main>
+          <SpeedInsights/>
+        </ClerkProvider>
       </body>
     </html>
   );
