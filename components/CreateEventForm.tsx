@@ -200,7 +200,7 @@ export default function CreateEventForm() {
             className={`${controlClasses} appearance-none pr-10`}
             id="mode"
             name="mode"
-            defaultValue=""
+            defaultValue="onsite"
             required
             aria-invalid={Boolean(fieldErrors.mode)}
             aria-describedby={fieldErrors.mode ? "mode-error" : undefined}
