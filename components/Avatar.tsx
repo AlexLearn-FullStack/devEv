@@ -21,7 +21,12 @@ export default function Avatar () {
       <Show when="signed-out">
         <DropdownMenu modal>
           <DropdownMenuTrigger asChild>
-            <span className="flex items-center justify-center size-8 p-3 text-sm text-light-200 border border-dark-200 bg-dark-100 cursor-pointer rounded-full">
+            <span
+              className="flex items-center justify-center size-8 p-3 text-sm text-light-200 border border-dark-200 bg-dark-100 cursor-pointer rounded-full"
+              role="button"
+              tabIndex={0}
+              aria-label="Guest avatar"
+            >
               G
             </span>
           </DropdownMenuTrigger>
@@ -31,18 +36,20 @@ export default function Avatar () {
                 Guest Mode
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="hover:bg-transparent! capitalize">
-                <Link href="/sign-in">Sign In</Link>
+              <DropdownMenuItem className="hover:bg-transparent! focus-within:bg-transparent! hover:text-light-200! focus-within:text-light-200! capitalize" asChild>
+                <Link href="/sign-in" className="text-light-100/80! mb-3">
+                  Sign In
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-transparent! capitalize">
-                <Link href="/sign-up">Sign Up</Link>
+              <DropdownMenuItem className="hover:bg-transparent! focus-within:bg-transparent! hover:text-light-200! focus-within:text-light-200! capitalize" asChild>
+                <Link href="/sign-up" className="text-light-100/80! mb-3">
+                  Sign Up
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="hover:bg-transparent! flex items-center justify-center">
-                <span className="text-xs text-light-200 lowercase first-letter:uppercase">
-                  Sign up or <span className="capitalize">S</span>ign in to start creating events
-                </span>
-              </DropdownMenuItem>
+              <span className="text-xs text-light-200">
+                Sign up or Sign in to start creating events
+              </span>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
