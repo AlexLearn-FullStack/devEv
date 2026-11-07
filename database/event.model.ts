@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/correctness/useParseIntRadix: Not needed? */
 import { Schema, model, models } from 'mongoose';
-import type { Document } from "mongoose";
+import type { Document, Types } from "mongoose";
 import { requireDocumentSaveForFieldUpdates } from './model-middleware';
 
 
@@ -18,6 +18,7 @@ export interface IEvent extends Document {
   audience: string;
   agenda: string[];
   organizer: string;
+  creator: Types.ObjectId;
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -105,6 +106,11 @@ const EventSchema = new Schema<IEvent>(
         message: 'At least one tag is required',
       },
     },
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Creator is required'],
+    }
   },
   {
     timestamps: true,
