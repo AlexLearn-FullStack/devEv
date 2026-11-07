@@ -1,7 +1,7 @@
-/** biome-ignore-all lint/suspicious/noImplicitAnyLet: initial declaration */
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import connectDB from "../mongodb";
 import { Booking, Event } from "@/database";
 import { getUserByClerkId } from "./user.actions";
@@ -20,7 +20,7 @@ export const createBooking = async ({ eventId, slug, email }: ICreateBooking) =>
 
     const { userId } = await auth();
 
-    let creator;
+    let creator: unknown = "Anonymous";
 
     if (userId) {
       const user = await getUserByClerkId(userId);
@@ -32,6 +32,7 @@ export const createBooking = async ({ eventId, slug, email }: ICreateBooking) =>
       eventId, slug, email,
       creator
     });
+    revalidateTag("events", "max");
   
     return { success: true };
   }

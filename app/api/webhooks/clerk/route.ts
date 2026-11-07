@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextResponse, type NextRequest } from "next/server";
 import { createUserFromClerk, deleteUser } from "@/lib/actions/user.actions";
@@ -29,7 +28,10 @@ export async function POST(request: NextRequest) {
     if (event.type === "user.deleted") {
       const userId = event.data.id;
 
-      if (userId) await deleteUser(userId);
+      if (userId) {
+        const result = await deleteUser(userId);
+        if (!result.success) throw new Error(`Failed to delete user ${userId}`);
+      }
     }
 
   } catch (error) {

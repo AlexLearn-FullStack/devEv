@@ -42,11 +42,8 @@ export async function createUserFromClerk(
   await User.updateOne(
     { clerkId: clerkUser.id },
     {
-      $setOnInsert: {
-        clerkId: clerkUser.id,
-        email,
-        displayName,
-      },
+      $set: { email, displayName },
+      $setOnInsert: { clerkId: clerkUser.id },
     },
     { upsert: true, runValidators: true },
   );
@@ -92,18 +89,12 @@ export async function getUserById (id: string) {
 }
 
 export async function getUserByClerkId (clerkId: string) {
-  try {
-    await connectDB();
+  await connectDB();
 
-    if (!clerkId)
-      return null;
-
-    const user = await User.findOne({ clerkId });
-
-    return user;  
-  }
-  catch (e) {
-    console.error(e)
+  if (!clerkId)
     return null;
-  }
+
+  const user = await User.findOne({ clerkId });
+
+  return user;
 }

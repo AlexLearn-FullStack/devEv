@@ -15,8 +15,8 @@ const UserSchema = new Schema<IUser>(
   {
     clerkId: {
       type: String,
-      required: [true, "Creator is required"],
-      match: [/^user_[A-Za-z0-9]+$/, "Creator must be a valid Clerk user ID"],
+      required: [true, "Clerk ID is required"],
+      match: [/^user_[A-Za-z0-9]+$/, "Clerk ID must be a valid Clerk user ID"],
     },
     email: {
       type: String,
