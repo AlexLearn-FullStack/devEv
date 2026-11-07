@@ -3,10 +3,14 @@ import Link from "next/link";
 import type { EventItem } from "@/constants";
 
 
+type EventCardProps = Pick<EventItem, "image" | "slug" | "title" | "location" | "date" | "time">
+  & Partial<Pick<EventItem, "mode">>;
+
+
 export default function EventCard ({
   image, slug, title,
   location, date, time
-}: EventItem) {
+}: EventCardProps) {
   
   return (
     <Link href={`/events/${slug}`} id="event-card">
