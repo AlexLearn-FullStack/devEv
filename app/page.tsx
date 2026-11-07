@@ -3,33 +3,23 @@
 import { cacheTag, cacheLife } from "next/cache";
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
-import { BASE_URL } from "@/constants";
-import type { IEvent } from "@/database";
+import type { EventItem } from "@/constants";
+import { Event } from "@/database";
+import connectDB from "@/lib/mongodb";
 
 
 export default async function Home() {
   cacheTag("events");
   cacheLife('hours');
-  let events: IEvent[] = [];
+  let events: Pick<EventItem, "image" | "slug" | "title" | "location" | "date" | "time">[] = [];
   let eventsError: string | null = null;
 
   try {
-    const response = await fetch(`${BASE_URL}/events`);
-    if (!response.ok) {
-      throw new Error(`Events request failed with status ${response.status}`);
-    }
-
-    const payload: unknown = await response.json();
-    if (
-      typeof payload !== "object" ||
-      payload === null ||
-      !("events" in payload) ||
-      !Array.isArray(payload.events)
-    ) {
-      throw new Error("Events response did not contain an events array");
-    }
-
-    events = payload.events as IEvent[];
+    await connectDB();
+    events = await Event.find()
+      .sort({ createdAt: -1 })
+      .select("image slug title location date time -_id")
+      .lean();
   } catch (error) {
     console.error("Failed to fetch events:", error);
     eventsError = "Events are temporarily unavailable. Please try again later.";
@@ -63,10 +53,7 @@ export default async function Home() {
                   events.map(
                     (event) => (
                       <li key={event.slug}>
-                        <EventCard
-                          {...event}
-                          mode={event.mode as "online" | "onsite" | "hybrid"}
-                        />
+                        <EventCard {...event} />
                       </li>
                     )
                   )
