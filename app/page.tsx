@@ -20,6 +20,7 @@ export default async function Home() {
       .sort({ createdAt: -1 })
       .select("image slug title location date time -_id")
       .lean();
+      
   } catch (error) {
     console.error("Failed to fetch events:", error);
     eventsError = "Events are temporarily unavailable. Please try again later.";
