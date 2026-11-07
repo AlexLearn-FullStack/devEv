@@ -1,7 +1,10 @@
 "use server";
 
+import { auth } from "@clerk/nextjs/server";
+import { updateTag } from "next/cache";
 import connectDB from "../mongodb";
-import { Booking } from "@/database";
+import { Booking, Event } from "@/database";
+import { getUserByClerkId } from "./user.actions";
 
 
 interface ICreateBooking {
@@ -15,7 +18,21 @@ export const createBooking = async ({ eventId, slug, email }: ICreateBooking) =>
   try {
     await connectDB();
 
-    await Booking.create({ eventId, slug, email });
+    const { userId } = await auth();
+
+    let creator: unknown = "Anonymous";
+
+    if (userId) {
+      const user = await getUserByClerkId(userId);
+      creator = user?._id || "Anonymous";
+    }
+
+
+    await Booking.create({
+      eventId, slug, email,
+      creator
+    });
+    updateTag("events");
   
     return { success: true };
   }
@@ -34,3 +51,18 @@ export const createBooking = async ({ eventId, slug, email }: ICreateBooking) =>
     };
   }
 }
+
+
+export const getEventBookingCount = async (slug: string): Promise<number> => {
+  try {
+    await connectDB();
+
+    const event = await Event.findOne({ slug }).select("_id");
+    if (!event) return 0;
+
+    return await Booking.countDocuments({ eventId: event._id });
+  } catch (e) {
+    console.error("Get event booking count failed:", e);
+    return 0;
+  }
+};

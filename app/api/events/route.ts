@@ -1,14 +1,33 @@
 /** biome-ignore-all lint/suspicious/noImplicitAnyLet: declared this way for validation */
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidateTag } from "next/cache";
+import { auth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
 import connectDB from "@/lib/mongodb";
 import { Event } from "@/database";
+import { getUserByClerkId } from "@/lib/actions/user.actions";
 
 
 export async function POST (req: NextRequest) {
   try {
     await connectDB();
+
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const user = await getUserByClerkId(userId);
+    if (!user) {
+      return NextResponse.json(
+        { message: "User profile not found" },
+        { status: 403 },
+      );
+    }
 
     const formData = await req.formData();
 
@@ -65,6 +84,7 @@ export async function POST (req: NextRequest) {
       ...event,
       tags: tags,
       agenda: agenda,
+      creator: user._id,
     });
     revalidateTag("events", "max");
 

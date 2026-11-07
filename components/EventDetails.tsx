@@ -8,6 +8,7 @@ import type { IEvent } from "@/database";
 import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
 import EventCard from "@/components/EventCard";
 import EventCardFallback from "@/components/fallbacks/EventCardFallback";
+import { getEventBookingCount } from "@/lib/actions/booking.actions";
 
 
 const EventDetailItem = ({
@@ -141,7 +142,7 @@ async function CachedEventDetails({ slug }: { slug: string }) {
     agenda, audience, tags
   } = event;
 
-  const bookings = 10;
+  const bookings = await getEventBookingCount(slug);
 
   return (
     <section id="event">
@@ -217,11 +218,11 @@ async function CachedEventDetails({ slug }: { slug: string }) {
               bookings > 0
                 ? (
                   <p className="text-sm">
-                    Join { bookings } people who have already booked their spot!
+                    Join { bookings } people who have already booked their spot.
                   </p>
                 )
                 : (
-                  <p className="text-sm">Be the first to book your spot!</p>
+                  <p className="text-sm">Be the first to claim your spot!</p>
                 )
             }
 

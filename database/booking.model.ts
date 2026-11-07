@@ -8,6 +8,7 @@ import Event from './event.model';
 export interface IBooking extends Document {
   eventId: Types.ObjectId;
   email: string;
+  creator: Types.ObjectId | 'Anonymous';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +32,11 @@ const BookingSchema = new Schema<IBooking>(
         },
         message: 'Please provide a valid email address',
       },
+    },
+    creator: {
+      type: Schema.Types.Mixed,
+      ref: 'User',
+      default: 'Anonymous',
     },
   },
   {
