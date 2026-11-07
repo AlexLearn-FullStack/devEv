@@ -63,7 +63,10 @@ export default async function Home() {
                   events.map(
                     (event) => (
                       <li key={event.slug}>
-                        <EventCard {...event} />
+                        <EventCard
+                          {...event}
+                          mode={event.mode as "online" | "onsite" | "hybrid"}
+                        />
                       </li>
                     )
                   )
