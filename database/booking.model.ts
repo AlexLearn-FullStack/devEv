@@ -6,7 +6,7 @@ import Event from './event.model';
 
 
 export interface IBooking extends Document {
-  eventId: Types.ObjectId;
+  eventId?: Types.ObjectId;
   email: string;
   creator: Types.ObjectId | 'Anonymous';
   createdAt: Date;
@@ -35,9 +35,8 @@ const BookingSchema = new Schema<IBooking>(
       },
     },
     creator: {
-      type: Schema.Types.Mixed,
+      type: Schema.Types.ObjectId,
       ref: 'User',
-      default: 'Anonymous',
     },
   },
   {

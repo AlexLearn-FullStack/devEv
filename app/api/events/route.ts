@@ -22,6 +22,12 @@ export async function POST (req: NextRequest) {
     }
 
     const user = await getUserByClerkId(userId);
+    if (!user) {
+      return NextResponse.json(
+        { message: "User profile not found" },
+        { status: 403 },
+      );
+    }
 
     const formData = await req.formData();
 
@@ -78,7 +84,7 @@ export async function POST (req: NextRequest) {
       ...event,
       tags: tags,
       agenda: agenda,
-      creator: user?._id,
+      creator: user._id,
     });
     revalidateTag("events", "max");
 
