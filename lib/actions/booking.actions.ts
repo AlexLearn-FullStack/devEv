@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import connectDB from "../mongodb";
 import { Booking, Event } from "@/database";
 import { getUserByClerkId } from "./user.actions";
@@ -32,7 +32,7 @@ export const createBooking = async ({ eventId, slug, email }: ICreateBooking) =>
       eventId, slug, email,
       creator
     });
-    revalidateTag("events", "max");
+    updateTag("events");
   
     return { success: true };
   }
